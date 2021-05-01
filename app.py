@@ -10,40 +10,32 @@ db.init_app(app)
 
 @app.route('/')
 def hello_world():
-    export_db(["users"])
+    export_db()
     return 'Hello World!'
 
 
 def export_db(obj_names=None):
     if obj_names is None:
         obj_names = list(db.metadata.tables.keys())
-    count = 0
-    writer = pd.ExcelWriter('pandas_multiple.xlsx', engine='xlsxwriter')  # Remove this if you want CSV file
+    writer = pd.ExcelWriter('pandas_multiple.xlsx', engine='xlsxwriter')
     for obj_name in obj_names:
         data_frame = {}
-        with app.app_context():
-            all_data = eval(obj_name.capitalize() + '.query.all()')
         all_items = eval(obj_name.capitalize() + '.__searchable__')
-        for i in all_items:
-            temp = []
-            for data in all_data:
-                temp.append(eval('data.' + i))
-            data_frame[i] = temp
-        count += 1
-        # EXCEL FILE CODE STARTS (3 Lines)
+        query_str = obj_name.capitalize() + '.query.with_entities('
+        for item in all_items:
+            data_frame[item] = []
+            query_str += obj_name.capitalize() + '.' + item + ','
+        query_str += ')'
+        all_data = eval(query_str)
+        count = 0
+        for data in all_data:
+            for d in data:
+                data_frame[all_items[count]].append(d)
+                count += 1
+            count = 0
         df = pd.DataFrame(data_frame)
         df.to_excel(writer, sheet_name=obj_name, index=False)
     writer.save()
-    # EXCEL FILE CODE ENDS
-
-    # CSV FILE CODE STARTS
-
-    # df = pd.DataFrame({'Table: ' + obj_name: [" "]})
-    # df.to_csv('test.csv', mode='a', index=False, )
-    # df = pd.DataFrame(data_frame)
-    # df.to_csv('test.csv', mode='a', index=False)
-
-    # CSV FILE CODE ENDS
 
 
 if __name__ == '__main__':

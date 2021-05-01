@@ -16,4 +16,5 @@ SQLAlchemy==1.4.12
 typing-extensions==3.7.4.3
 Werkzeug==1.0.1
 wincertstore==0.2
+XlsxWriter==1.4.0
 zipp==3.4.1
