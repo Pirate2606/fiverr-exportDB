@@ -6,6 +6,8 @@ db = SQLAlchemy()
 
 
 class Users(db.Model):
+    __searchable__ = ["name", "age", "gender"]
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
     age = db.Column(db.Integer)
@@ -15,12 +17,16 @@ class Users(db.Model):
 
 
 class Posts(db.Model):
+    __searchable__ = ["username", "text"]
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(256))
     text = db.Column(db.String(256))
 
 
 class Stats(db.Model):
+    __searchable__ = ["userName", "likes", "followers", "following"]
+
     id = db.Column(db.Integer, primary_key=True)
     userName = db.Column(db.String(256))
     likes = db.Column(db.Integer)
