@@ -4,8 +4,8 @@ from config import Config
 from cli import create_db
 import pandas as pd
 from models import *
-from forms import LoginForm, ExampleRadioForm
-from wtforms import StringField, TextAreaField, RadioField, SelectField
+from forms import LoginForm, MultiCheckboxField
+from wtforms import StringField, TextAreaField, RadioField, SelectField, BooleanField
 import json
 
 app.config['SECRET_KEY'] = 'verySecretCode'
@@ -17,10 +17,18 @@ db.init_app(app)
 @app.route('/', methods=['GET', 'POST'])
 def hello_world():
     # export_db()
-    record = {"question": ["What is your name?", "What is age?", "What is class", "What is up?"],
-              "type": ["StringField", "RadioField", "TextAreaField", "SelectField"],
-              "choices": [[], [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")], [],
-                          [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")]]}
+    record = {"question": ["What is your name?", "What is age?", "What is class", "What is up?", "Agree",
+                           "Select Multiple"],
+              "type": ["StringField", "RadioField", "TextAreaField", "SelectField", "BooleanField",
+                       "MultiCheckboxField"],
+              "choices": [
+                  [],
+                  [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")],
+                  [],
+                  [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")],
+                  [],
+                  [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")]
+              ]}
     json_record = json.dumps(record)
     create_form_object(json_record)
     form = LoginForm()
@@ -31,7 +39,7 @@ def create_form_object(json_obj):
     record = json.loads(json_obj)
     for i in range(len(record["question"])):
         variable_name = 'question' + str(i)
-        if "Radio" not in record["type"][i] and "Select" not in record["type"][i]:
+        if "Radio" not in record["type"][i] and "Select" not in record["type"][i] and "Checkbox" not in record["type"][i]:
             obj = record["type"][i] + f"('{record['question'][i]}', validators=[DataRequired()])"
         else:
             obj = record["type"][i] + \
