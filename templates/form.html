@@ -1,0 +1,30 @@
+<html>
+<head>
+    <title>
+        Interesting TITLE
+    </title>
+</head>
+<body>
+<form method="POST" action="{{ url_for('hello_world') }}">
+    {{ form.csrf_token }}
+    {{ form.question0.label }}
+    {{ form.question0 }}
+    <br>
+    {{ form.question1.label }}
+    {{ form.question1 }}
+    <br>
+    {{ form.question2.label }}
+    {{ form.question2 }}
+    <br>
+    {{ form.question3.label }}
+    {{ form.question3 }}
+    <br>
+    {{ form.submit }}
+{#    {% for choice in form2.choices %}#}
+{#        {{ choice() }}#}
+{#        {{ choice.label() }}#}
+{#    {% endfor %}#}
+
+</form>
+</body>
+</html>

@@ -1,17 +1,43 @@
+from flask import render_template
+from wtforms.validators import DataRequired
 from config import Config
 from cli import create_db
 import pandas as pd
 from models import *
+from forms import LoginForm, ExampleRadioForm
+from wtforms import StringField, TextAreaField, RadioField, SelectField
+import json
 
+app.config['SECRET_KEY'] = 'verySecretCode'
 app.config.from_object(Config)
 app.cli.add_command(create_db)
 db.init_app(app)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def hello_world():
-    export_db()
-    return 'Hello World!'
+    # export_db()
+    record = {"question": ["What is your name?", "What is age?", "What is class", "What is up?"],
+              "type": ["StringField", "RadioField", "TextAreaField", "SelectField"],
+              "choices": [[], [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")], [],
+                          [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")]]}
+    json_record = json.dumps(record)
+    create_form_object(json_record)
+    form = LoginForm()
+    return render_template('form.html', form=form)
+
+
+def create_form_object(json_obj):
+    record = json.loads(json_obj)
+    for i in range(len(record["question"])):
+        variable_name = 'question' + str(i)
+        if "Radio" not in record["type"][i] and "Select" not in record["type"][i]:
+            obj = record["type"][i] + f"('{record['question'][i]}', validators=[DataRequired()])"
+        else:
+            obj = record["type"][i] + \
+                  f"('{record['question'][i]}', validators=[DataRequired()], choices={record['choices'][i]})"
+        setattr(LoginForm, variable_name, eval(obj))
+        login = LoginForm()
 
 
 def export_db(obj_names=None):
