@@ -1,12 +1,13 @@
 from flask import render_template
-from wtforms.validators import DataRequired
 from config import Config
 from cli import create_db
 import pandas as pd
 from models import *
 from forms import LoginForm, MultiCheckboxField
 from wtforms import StringField, TextAreaField, RadioField, SelectField, BooleanField
+from wtforms.validators import DataRequired
 import json
+import copy
 
 app.config['SECRET_KEY'] = 'verySecretCode'
 app.config.from_object(Config)
@@ -29,13 +30,14 @@ def hello_world():
                   [],
                   [("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5")]
               ]}
+    login = copy.deepcopy(LoginForm)
     json_record = json.dumps(record)
-    create_form_object(json_record)
+    create_form_object(json_record, login)
     form = LoginForm()
     return render_template('form.html', form=form)
 
 
-def create_form_object(json_obj):
+def create_form_object(json_obj, login_obj):
     record = json.loads(json_obj)
     for i in range(len(record["question"])):
         variable_name = 'question' + str(i)
@@ -44,8 +46,7 @@ def create_form_object(json_obj):
         else:
             obj = record["type"][i] + \
                   f"('{record['question'][i]}', validators=[DataRequired()], choices={record['choices'][i]})"
-        setattr(LoginForm, variable_name, eval(obj))
-        login = LoginForm()
+        setattr(login_obj, variable_name, eval(obj))
 
 
 def export_db(obj_names=None):
