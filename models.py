@@ -32,3 +32,8 @@ class Stats(db.Model):
     likes = db.Column(db.Integer)
     followers = db.Column(db.Integer)
     following = db.Column(db.Integer)
+
+
+class Questions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    questions = db.Column(db.String())
